@@ -1,9 +1,12 @@
 package com.xaillaclass.premium.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +21,7 @@ import com.xaillaclass.premium.util.PrefsHelper
 import com.xaillaclass.premium.v2ray.V2RayService
 
 class HomeFragment : Fragment() {
+
     private val vpnPermissionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) startVpnService()
         else Toast.makeText(requireContext(), "Izin VPN ditolak", Toast.LENGTH_SHORT).show()
@@ -27,14 +31,16 @@ class HomeFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         val btnConnect = view.findViewById<Button>(R.id.btnConnect)
         val tvStatus = view.findViewById<TextView>(R.id.tvStatus)
+        val tvActiveName = view.findViewById<TextView>(R.id.tvActiveName)
 
         updateUi(view, PrefsHelper.isVpnActive(requireContext()))
 
         btnConnect.setOnClickListener {
             val isConnected = PrefsHelper.isVpnActive(requireContext())
             if (!isConnected) {
-                if (PrefsHelper.getSelected(requireContext()) == null) {
-                    Toast.makeText(requireContext(), "Pilih config terlebih dahulu!", Toast.LENGTH_LONG).show()
+                val selectedConfig = PrefsHelper.getSelected(requireContext())
+                if (selectedConfig == null) {
+                    Toast.makeText(requireContext(), "Pilih config di tab Config terlebih dahulu!", Toast.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
                 val intent = VpnService.prepare(requireContext())
@@ -45,11 +51,21 @@ class HomeFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Refresh UI saat kembali dari tab Config (jika config berubah)
+        view?.let { updateUi(it, PrefsHelper.isVpnActive(requireContext())) }
+    }
+
     private fun startVpnService() {
         val intent = Intent(requireContext(), V2RayService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) requireContext().startForegroundService(intent) else requireContext().startService(intent)
         PrefsHelper.setVpnActive(requireContext(), true)
-        updateUi(requireView(), true)
+        
+        // Update UI setelah delay kecil agar status "connected" muncul smooth
+        Handler(Looper.getMainLooper()).postDelayed({
+            view?.let { updateUi(it, true) }
+        }, 300)
     }
 
     private fun stopVpnService() {
@@ -62,6 +78,12 @@ class HomeFragment : Fragment() {
     private fun updateUi(view: View, isConnected: Boolean) {
         val btnConnect = view.findViewById<Button>(R.id.btnConnect)
         val tvStatus = view.findViewById<TextView>(R.id.tvStatus)
+        val tvActiveName = view.findViewById<TextView>(R.id.tvActiveName)
+
+        // Tampilkan nama config yang sedang aktif
+        val activeConfig = PrefsHelper.getSelected(requireContext())
+        tvActiveName.text = activeConfig?.name ?: "Belum ada akun dipilih"
+        
         if (isConnected) {
             tvStatus.text = getString(R.string.status_connected)
             tvStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_success))

@@ -2,14 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical"
     android:gravity="center" android:padding="24dp" android:background="?android:attr/windowBackground">
+    
     <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content"
         app:cardCornerRadius="24dp" app:cardElevation="6dp" app:cardBackgroundColor="?attr/colorSurface">
+        
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="vertical" android:gravity="center" android:padding="32dp">
+            
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/app_name" android:textSize="22sp" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" />
+            
+            <TextView android:id="@+id/tvActiveName" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:text="Belum ada akun dipilih" 
+                android:textSize="14sp" android:textStyle="italic" android:textColor="?attr/colorPrimary" />
+            
             <TextView android:id="@+id/tvStatus" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:text="@string/status_disconnected" android:textColor="?android:attr/textColorSecondary" android:textSize="14sp" />
+                android:layout_marginTop="16dp" android:text="@string/status_disconnected" android:textColor="?android:attr/textColorSecondary" android:textSize="14sp" />
+            
             <Button android:id="@+id/btnConnect" android:layout_width="match_parent" android:layout_height="55dp"
                 android:layout_marginTop="32dp" android:text="@string/connect" android:textSize="16sp"
                 android:textStyle="bold" android:textColor="#FFFFFF" android:backgroundTint="@color/blue_primary" app:cornerRadius="28dp" />
