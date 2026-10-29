@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- TEMA -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,13 +19,11 @@
             app:cardElevation="4dp"
             app:cardBackgroundColor="?attr/colorSurface"
             android:layout_marginBottom="16dp">
-            
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
-                
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -32,7 +31,6 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="?android:attr/textColorPrimary"/>
-
                 <Spinner
                     android:id="@+id/spinnerTheme"
                     android:layout_width="match_parent"
@@ -41,6 +39,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- HOTSPOT & ROOT -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,13 +47,13 @@
             app:cardElevation="4dp"
             app:cardBackgroundColor="?attr/colorSurface"
             android:layout_marginBottom="16dp">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Mode Root -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -65,11 +64,11 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Aktifkan Hotspot"
+                        android:text="Gunakan Root (Proxy)"
                         android:textSize="16sp"
                         android:textColor="?android:attr/textColorPrimary"/>
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchHotspot"
+                        android:id="@+id/switchRoot"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -80,6 +79,7 @@
                     android:background="#E5E7EB"
                     android:layout_marginVertical="8dp"/>
 
+                <!-- Hotspot Switch -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -90,38 +90,73 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Mode Root (Proxy)"
+                        android:text="Aktifkan Hotspot Proxy"
                         android:textSize="16sp"
                         android:textColor="?android:attr/textColorPrimary"/>
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchRoot"
+                        android:id="@+id/switchHotspot"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
+
+                <!-- Info IP & Port (Tersembunyi by default) -->
+                <LinearLayout
+                    android:id="@+id/layoutInfoHotspot"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="12dp"
+                    android:padding="12dp"
+                    android:background="#EFF6FF"
+                    android:visibility="gone">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Info Proxy Hotspot (Untuk HP Client):"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#1E3A8A"/>
+                    <TextView
+                        android:id="@+id/tvHotspotIp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="IP: -"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#1E40AF"/>
+                    <TextView
+                        android:id="@+id/tvHotspotPort"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Port: -"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#1E40AF"/>
+                </LinearLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- DEVELOPER -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:cardBackgroundColor="?attr/colorSurface">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:padding="24dp">
-                
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Developer"
                     android:textSize="14sp"
                     android:textColor="?android:attr/textColorSecondary"/>
-                
                 <TextView
                     android:id="@+id/tvDeveloper"
                     android:layout_width="wrap_content"
@@ -131,7 +166,6 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
                     android:layout_marginTop="4dp"/>
-                
                 <TextView
                     android:id="@+id/tvVersion"
                     android:layout_width="wrap_content"
