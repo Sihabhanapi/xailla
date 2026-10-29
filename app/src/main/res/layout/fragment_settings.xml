@@ -90,7 +90,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Aktifkan Hotspot Proxy"
+                        android:text="Aktifkan Proxy Hotspot"
                         android:textSize="16sp"
                         android:textColor="?android:attr/textColorPrimary"/>
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -98,6 +98,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
+
+                <!-- Tombol Buka Hotspot (Hanya muncul jika belum nyala) -->
+                <Button
+                    android:id="@+id/btnOpenHotspotSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Buka Pengaturan Hotspot HP"
+                    android:textSize="12sp"
+                    android:backgroundTint="?attr/colorPrimary"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="8dp"/>
 
                 <!-- Info IP & Port (Tersembunyi by default) -->
                 <LinearLayout
