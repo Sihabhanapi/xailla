@@ -10,10 +10,10 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.xaillaclass.premium.BuildConfig
+import com.xaillaclass.premium.MainActivity
 import com.xaillaclass.premium.R
 
 class SettingsFragment : Fragment() {
@@ -49,8 +49,9 @@ class SettingsFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
                 if (prefs.getInt(KEY_THEME, 0) != position) {
                     prefs.edit().putInt(KEY_THEME, position).apply()
-                    applyTheme(position)
-                    // Restart Activity untuk menerapkan tema secara menyeluruh
+                    // Panggil metode ganti tema dari MainActivity
+                    (requireActivity() as? MainActivity)?.applyTheme(position)
+                    // Restart activity agar perubahan langsung terlihat
                     requireActivity().recreate()
                 }
             }
@@ -74,22 +75,5 @@ class SettingsFragment : Fragment() {
         }
 
         return view
-    }
-
-    private fun applyTheme(position: Int) {
-        when (position) {
-            0 -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                requireActivity().setTheme(R.style.Theme_XaillaClass_White)
-            }
-            1 -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                requireActivity().setTheme(R.style.Theme_XaillaClass_Blue)
-            }
-            2 -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                requireActivity().setTheme(R.style.Theme_XaillaClass_Black)
-            }
-        }
     }
 }
