@@ -10,17 +10,18 @@ import com.xaillaclass.premium.ui.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Ambil Tema Sebelum Memuat Layout
+        // 1. Ambil tema SEBELUM super.onCreate
         val prefs = getSharedPreferences("xaillaclass_settings", Context.MODE_PRIVATE)
         val theme = prefs.getInt("theme", 0)
         applyTheme(theme)
-
+        
+        // 2. super.onCreate setelah setTheme
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        
+
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         if (savedInstanceState == null) loadFragment(HomeFragment())
-        
+
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> loadFragment(HomeFragment())
@@ -34,15 +35,15 @@ class MainActivity : AppCompatActivity() {
 
     fun applyTheme(theme: Int) {
         when (theme) {
-            0 -> { // Putih
+            0 -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 setTheme(R.style.Theme_XaillaClass_White)
             }
-            1 -> { // Biru
+            1 -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 setTheme(R.style.Theme_XaillaClass_Blue)
             }
-            2 -> { // Hitam
+            2 -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 setTheme(R.style.Theme_XaillaClass_Black)
             }

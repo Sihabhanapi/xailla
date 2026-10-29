@@ -26,7 +26,11 @@ android {
 
     packaging {
         jniLibs {
-            pickFirsts += listOf("**/libc++_shared.so", "**/libv2ray.so", "**/libv2rayx.so")
+            useLegacyPackaging = true
+            pickFirsts += listOf(
+                "**/libgojni.so",
+                "**/libc++_shared.so"
+            )
         }
     }
 
@@ -43,8 +47,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-    
-    // FIX: Tambahkan buildConfig = true
     buildFeatures { 
         viewBinding = true
         buildConfig = true 
@@ -68,4 +70,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.code.gson:gson:2.10.1")
+    
+    // ENGINE XRAY
+    implementation(files("libs/libv2ray.aar"))
 }
