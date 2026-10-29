@@ -2,17 +2,21 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
 android {
     namespace = "com.xaillaclass.premium"
     compileSdk = 34
+
     defaultConfig {
         applicationId = "com.xaillaclass.premium"
         minSdk = 21
         targetSdk = 34
         versionCode = 1000
         versionName = "1.0.0"
-        ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
+        // JANGAN taruh ndk { abiFilters } di sini karena sudah diurus oleh splits
     }
+
+    // Hanya gunakan splits untuk memisahkan APK
     splits {
         abi {
             isEnable = true
@@ -21,7 +25,13 @@ android {
             isUniversalApk = false
         }
     }
-    packaging { jniLibs { pickFirsts += listOf("**/libc++_shared.so", "**/libv2ray.so", "**/libv2rayx.so") } }
+
+    packaging {
+        jniLibs {
+            pickFirsts += listOf("**/libc++_shared.so", "**/libv2ray.so", "**/libv2rayx.so")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -29,11 +39,14 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    buildFeatures { viewBinding = true }
+
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
@@ -42,6 +55,7 @@ android {
         }
     }
 }
+
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
