@@ -38,9 +38,6 @@ android {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
             val abi = output.getFilter(com.android.build.OutputFile.ABI) ?: "universal"
-            val abiCode = when (abi) { "armeabi-v7a" -> 1; "arm64-v8a" -> 2; else -> 0 }
-            output.versionCodeOverride = 1000 + abiCode
-            output.versionNameOverride = "1.0.0-$abi"
             output.outputFileName = "XaillaClass-Premium-1.0.0-$abi.apk"
         }
     }
