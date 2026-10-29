@@ -31,31 +31,43 @@ object HotspotHelper {
 
     fun setHotspotEnabled(context: Context, enabled: Boolean, useRoot: Boolean): Boolean {
         return if (useRoot) {
-            // --- LOGIKA ROOT ---
+            // --- LOGIKA ROOT (Mengadopsi VPN Gateway Kr328) ---
             if (!RootHelper.isRooted()) {
                 Toast.makeText(context, "Akses Root ditolak / Tidak tersedia!", Toast.LENGTH_LONG).show()
                 return false
             }
+            
             try {
                 val process = Runtime.getRuntime().exec("su")
                 val os = DataOutputStream(process.outputStream)
-                // Perintah iptables untuk redirect trafik hotspot ke proxy lokal (contoh port 8080)
+                
                 if (enabled) {
-                    os.writeBytes("sysctl -w net.ipv4.ip_forward=1\n")
-                    os.writeBytes("iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 80 -j REDIRECT --to-port 8080\n")
-                    os.writeBytes("iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 443 -j REDIRECT --to-port 8080\n")
+                    // 1. Nyalakan Hotspot bawaan Android (via reflection)
+                    enableNativeHotspot(context)
+                    
+                    // 2. Jalankan script VPN Gateway (iptables & ip_forward)
+                    os.writeBytes("echo 1 > /proc/sys/net/ipv4/ip_forward\n")
+                    os.writeBytes("iptables -P FORWARD ACCEPT\n")
+                    os.writeBytes("iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE\n")
+                    os.writeBytes("iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE\n")
+                    // Bypass trafik LAN ke VPN (Tun)
+                    os.writeBytes("iptables -t nat -A PREROUTING -i wlan0 -p tcp -j REDIRECT --to-port 8080\n")
                 } else {
-                    os.writeBytes("iptables -t nat -D PREROUTING -i wlan0 -p tcp --dport 80 -j REDIRECT --to-port 8080\n")
-                    os.writeBytes("iptables -t nat -D PREROUTING -i wlan0 -p tcp --dport 443 -j REDIRECT --to-port 8080\n")
+                    // Matikan Hotspot & Hapus Aturan iptables
+                    disableNativeHotspot(context)
+                    os.writeBytes("iptables -t nat -D POSTROUTING -o tun0 -j MASQUERADE\n")
+                    os.writeBytes("iptables -t nat -D POSTROUTING -o wlan0 -j MASQUERADE\n")
+                    os.writeBytes("iptables -t nat -D PREROUTING -i wlan0 -p tcp -j REDIRECT --to-port 8080\n")
                 }
+                
                 os.writeBytes("exit\n")
                 os.flush()
                 os.close()
                 process.waitFor()
-                true
+                return true
             } catch (e: Exception) {
-                Toast.makeText(context, "Gagal menjalankan perintah Root", Toast.LENGTH_SHORT).show()
-                false
+                Toast.makeText(context, "Gagal menjalankan script Root", Toast.LENGTH_SHORT).show()
+                return false
             }
         } else {
             // --- LOGIKA NO-ROOT ---
@@ -66,16 +78,38 @@ object HotspotHelper {
                 context.startActivity(intent)
                 return false
             }
-            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            try {
-                val method: Method = wifiManager.javaClass.getMethod(
-                    "setWifiApEnabled", android.net.wifi.WifiConfiguration::class.java, Boolean::class.javaPrimitiveType
-                )
-                wifiManager.isWifiEnabled = false
-                method.invoke(wifiManager, null, enabled) as Boolean
-            } catch (e: Exception) {
-                false
-            }
+            return enableNativeHotspot(context)
         }
+    }
+
+    // Helper untuk menyalakan Hotspot via Refleksi
+    private fun enableNativeHotspot(context: Context): Boolean {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return try {
+            val method: Method = wifiManager.javaClass.getMethod(
+                "setWifiApEnabled", android.net.wifi.WifiConfiguration::class.java, Boolean::class.javaPrimitiveType
+            )
+            wifiManager.isWifiEnabled = false
+            method.invoke(wifiManager, null, true) as Boolean
+        } catch (e: Exception) { false }
+    }
+
+    private fun disableNativeHotspot(context: Context): Boolean {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return try {
+            val method: Method = wifiManager.javaClass.getMethod(
+                "setWifiApEnabled", android.net.wifi.WifiConfiguration::class.java, Boolean::class.javaPrimitiveType
+            )
+            method.invoke(wifiManager, null, false) as Boolean
+        } catch (e: Exception) { false }
+    }
+
+    fun isHotspotEnabled(context: Context): Boolean {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return try {
+            val method: Method = wifiManager.javaClass.getDeclaredMethod("isWifiApEnabled")
+            method.isAccessible = true
+            method.invoke(wifiManager) as Boolean
+        } catch (e: Exception) { false }
     }
 }

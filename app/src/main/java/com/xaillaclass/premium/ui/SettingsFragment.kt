@@ -30,7 +30,6 @@ class SettingsFragment : Fragment() {
         val switchHotspot = view.findViewById<SwitchMaterial>(R.id.switchHotspot)
         val switchRoot = view.findViewById<SwitchMaterial>(R.id.switchRoot)
         
-        // View Info Hotspot
         val layoutInfoHotspot = view.findViewById<LinearLayout>(R.id.layoutInfoHotspot)
         val tvHotspotIp = view.findViewById<TextView>(R.id.tvHotspotIp)
         val tvHotspotPort = view.findViewById<TextView>(R.id.tvHotspotPort)
@@ -61,7 +60,7 @@ class SettingsFragment : Fragment() {
             if (isChecked) {
                 if (!RootHelper.isRooted()) {
                     Toast.makeText(requireContext(), "HP Tidak ter-root / Izin ditolak!", Toast.LENGTH_LONG).show()
-                    switchRoot.isChecked = false // Batalkan switch
+                    switchRoot.isChecked = false 
                     return@setOnCheckedChangeListener
                 }
             }
@@ -79,17 +78,21 @@ class SettingsFragment : Fragment() {
             if (success) {
                 if (isChecked) {
                     layoutInfoHotspot.visibility = View.VISIBLE
-                    // Ambil IP dinamis dan Port (misal 8080)
                     val ip = HotspotHelper.getHotspotIpAddress()
                     tvHotspotIp.text = "IP: $ip"
                     tvHotspotPort.text = "Port: 8080"
-                    Toast.makeText(requireContext(), "Hotspot Proxy aktif", Toast.LENGTH_SHORT).show()
+                    
+                    if (useRoot) {
+                        Toast.makeText(requireContext(), "Mode Root: iptables VPN Gateway Aktif", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Mode No-Root: Proxy Hotspot aktif", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     layoutInfoHotspot.visibility = View.GONE
                     Toast.makeText(requireContext(), "Hotspot dimatikan", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                switchHotspot.isChecked = !isChecked // Kembalikan switch jika gagal
+                switchHotspot.isChecked = !isChecked
             }
         }
 
