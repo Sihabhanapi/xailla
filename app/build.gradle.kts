@@ -13,10 +13,8 @@ android {
         targetSdk = 34
         versionCode = 1000
         versionName = "1.0.0"
-        // JANGAN taruh ndk { abiFilters } di sini karena sudah diurus oleh splits
     }
 
-    // Hanya gunakan splits untuk memisahkan APK
     splits {
         abi {
             isEnable = true
@@ -45,7 +43,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-    buildFeatures { viewBinding = true }
+    
+    // FIX: Tambahkan buildConfig = true
+    buildFeatures { 
+        viewBinding = true
+        buildConfig = true 
+    }
 
     applicationVariants.all {
         outputs.all {
