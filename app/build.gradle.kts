@@ -28,7 +28,8 @@ android {
         jniLibs {
             useLegacyPackaging = true
             pickFirsts += listOf(
-                "**/libgojni.so",
+                "**"**/libgojni.so",
+                "**/libtun2socks.so",
                 "**/libc++_shared.so"
             )
         }

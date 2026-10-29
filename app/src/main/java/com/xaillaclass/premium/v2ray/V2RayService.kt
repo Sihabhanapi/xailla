@@ -11,9 +11,6 @@ import androidx.core.app.NotificationCompat
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.Libv2ray
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import kotlin.concurrent.thread
 
 class V2RayService : VpnService() {
 
@@ -21,6 +18,7 @@ class V2RayService : VpnService() {
     private var coreController: CoreController? = null
     private var vpnInterface: ParcelFileDescriptor? = null
     private var isRunning = false
+    private var tun2socksStarted = false
 
     companion object {
         const val XRAY_PORT = 10808
@@ -47,21 +45,30 @@ class V2RayService : VpnService() {
             startForeground(1, buildNotification())
             if (startXray()) {
                 if (establishVpn()) {
-                    startForwardingLoop()
+                    startTun2Socks()
                     isRunning = true
+                } else {
+                    Log.e(TAG, "establishVpn gagal")
                 }
+            } else {
+                Log.e(TAG, "startXray gagal")
             }
-            if (!isRunning) stopSelf()
+            if (!isRunning) {
+                stopVpn()
+            }
         }
         return START_STICKY
     }
 
-    // 1. Jalankan Xray
+    // 1. Jalankan Xray SOCKS5 di 127.0.0.1:10808
     private fun startXray(): Boolean {
         return try {
             Libv2ray.initCoreEnv("", "")
             val handler = object : CoreCallbackHandler {
-                override fun onEmitStatus(code: Long, message: String?): Long = 0
+                override fun onEmitStatus(code: Long, message: String?): Long {
+                    Log.d(TAG, "Xray[$code]: $message")
+                    return 0
+                }
                 override fun shutdown(): Long = 0
                 override fun startup(): Long = 0
             }
@@ -83,14 +90,15 @@ class V2RayService : VpnService() {
 
             coreController = Libv2ray.newCoreController(handler)
             coreController?.startLoop(configJson, XRAY_PORT)
+            Log.d(TAG, "Xray started di $XRAY_PORT")
             true
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.e(TAG, "Xray start fail", e)
             false
         }
     }
 
-    // 2. Bangun Antarmuka VPN
+    // 2. Bikin antarmuka VPN (tun)
     private fun establishVpn(): Boolean {
         return try {
             val builder = Builder()
@@ -102,42 +110,35 @@ class V2RayService : VpnService() {
                 .setBlocking(true)
 
             vpnInterface = builder.establish()
+            Log.d(TAG, "VPN interface = $vpnInterface")
             vpnInterface != null
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.e(TAG, "VPN establish fail", e)
             false
         }
     }
 
-    // 3. Loop Forwarding (DUMMY DISINI - karena butuh tun2socks asli)
-    // Ini adalah placeholder yang memastikan tidak crash.
-    // Untuk fungsi penuh, kita perlu binary tun2socks (tidak tersedia di AAR).
-    private fun startForwardingLoop() {
-        thread(isDaemon = true) {
-            try {
-                val iface = vpnInterface ?: return@thread
-                val input = FileInputStream(iface.fileDescriptor)
-                val output = FileOutputStream(iface.fileDescriptor)
-                val buffer = ByteArray(MTU)
-                while (isRunning && !Thread.interrupted()) {
-                    val length = input.read(buffer)
-                    if (length > 0) {
-                        // TODO: kirim ke Xray di port 10808 via SOCKS5
-                        // Untuk sekarang, pakai internet langsung (no forward)
-                        output.write(buffer, 0, length)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Forward loop err", e)
-            }
+    // 3. Pasang tun2socks (REAL, bukan dummy)
+    private fun startTun2Socks() {
+        val iface = vpnInterface ?: return
+        val fd = iface.fd
+        val ok = Tun2SocksHelper.start(fd, "127.0.0.1", XRAY_PORT)
+        tun2socksStarted = ok
+        Log.d(TAG, "tun2socks started=$ok")
+        if (!ok) {
+            Log.e(TAG, "tun2socks gagal start, VPN tidak akan forward trafik")
         }
     }
 
     private fun stopVpn() {
         try {
-            coreController?.stopLoop()
-            vpnInterface?.close()
-        } catch (e: Exception) {}
+            if (tun2socksStarted) {
+                Tun2SocksHelper.stop()
+                tun2socksStarted = false
+            }
+        } catch (e: Throwable) { }
+        try { coreController?.stopLoop() } catch (e: Throwable) { }
+        try { vpnInterface?.close() } catch (e: Throwable) { }
         coreController = null
         vpnInterface = null
         isRunning = false
@@ -148,7 +149,7 @@ class V2RayService : VpnService() {
     private fun buildNotification(): Notification =
         NotificationCompat.Builder(this, channelId)
             .setContentTitle("XaillaClass Premium")
-            .setContentText("VPN aktif")
+            .setContentText("VPN aktif & meneruskan trafik")
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setOngoing(true)
             .build()
