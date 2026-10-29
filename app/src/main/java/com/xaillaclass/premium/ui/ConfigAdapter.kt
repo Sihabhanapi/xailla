@@ -1,5 +1,6 @@
 package com.xaillaclass.premium.ui
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,11 +8,13 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.xaillaclass.premium.R
 import com.xaillaclass.premium.model.ServerConfig
 
 class ConfigAdapter(
     private var items: List<ServerConfig>,
+    private var selectedId: String?,
     private val onSelect: (ServerConfig) -> Unit,
     private val onEditBasic: (ServerConfig) -> Unit,
     private val onEditFull: (ServerConfig) -> Unit,
@@ -21,8 +24,14 @@ class ConfigAdapter(
     private val onDelete: (ServerConfig) -> Unit
 ) : RecyclerView.Adapter<ConfigAdapter.VH>() {
 
-    fun updateData(newItems: List<ServerConfig>) {
+    fun updateData(newItems: List<ServerConfig>, newSelectedId: String?) {
         items = newItems
+        selectedId = newSelectedId
+        notifyDataSetChanged()
+    }
+
+    fun updateSelection(newSelectedId: String?) {
+        selectedId = newSelectedId
         notifyDataSetChanged()
     }
 
@@ -35,7 +44,30 @@ class ConfigAdapter(
         val item = items[position]
         holder.tvName.text = item.name
         holder.tvInfo.text = "${item.protocol.uppercase()} • ${item.address}:${item.port}"
-        
+
+        // Highlight hijau jika terpilih
+        if (item.id == selectedId) {
+            holder.card.setCardBackgroundColor(Color.parseColor("#D1FAE5")) // Hijau muda
+            holder.tvName.setTextColor(Color.parseColor("#065F46")) // Hijau tua
+            holder.tvInfo.setTextColor(Color.parseColor("#047857"))
+        } else {
+            holder.card.setCardBackgroundColor(
+                com.google.android.material.color.MaterialColors.getColor(
+                    holder.card, com.google.android.material.R.attr.colorSurface
+                )
+            )
+            holder.tvName.setTextColor(
+                com.google.android.material.color.MaterialColors.getColor(
+                    holder.card, com.google.android.material.R.attr.colorOnSurface
+                )
+            )
+            holder.tvInfo.setTextColor(
+                com.google.android.material.color.MaterialColors.getColor(
+                    holder.card, com.google.android.material.R.attr.colorOnSurfaceVariant
+                )
+            )
+        }
+
         holder.itemView.setOnClickListener { onSelect(item) }
 
         holder.btnOptions.setOnClickListener { btn ->
@@ -59,6 +91,7 @@ class ConfigAdapter(
     override fun getItemCount() = items.size
 
     class VH(v: View) : RecyclerView.ViewHolder(v) {
+        val card: MaterialCardView = v.findViewById(R.id.cardConfig)
         val tvName: TextView = v.findViewById(R.id.tvName)
         val tvInfo: TextView = v.findViewById(R.id.tvInfo)
         val btnOptions: ImageButton = v.findViewById(R.id.btnOptions)
