@@ -1,9 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.XaillaClass" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/blue_primary</item>
-        <item name="android:statusBarColor">#FFFFFF</item>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.XaillaClass" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#2563EB</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">#FFFFFF</item>
+    </style>
+
+    <!-- TEMA PUTIH (Default) -->
+    <style name="Theme.XaillaClass.White" parent="Theme.XaillaClass">
+        <item name="colorPrimary">#2563EB</item>
+        <item name="android:windowBackground">#F8F9FA</item>
+        <item name="colorSurface">#FFFFFF</item>
+    </style>
+
+    <!-- TEMA BIRU (Elegan & Transparan) -->
+    <style name="Theme.XaillaClass.Blue" parent="Theme.XaillaClass">
+        <item name="colorPrimary">#3B82F6</item>
+        <item name="android:windowBackground">#EFF6FF</item>
+        <item name="colorSurface">#BFDBFE</item> <!-- Biru muda transparan -->
+        <item name="android:statusBarColor">#3B82F6</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- TEMA HITAM (Elegan & Transparan) -->
+    <style name="Theme.XaillaClass.Black" parent="Theme.XaillaClass">
+        <item name="colorPrimary">#60A5FA</item>
+        <item name="android:windowBackground">#0F172A</item> <!-- Dark Navy -->
+        <item name="colorSurface">#1E293B</item> <!-- Dark Gray transparan -->
+        <item name="android:statusBarColor">#0F172A</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

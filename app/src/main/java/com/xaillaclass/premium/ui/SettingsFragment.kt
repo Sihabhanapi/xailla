@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
@@ -27,7 +28,6 @@ class SettingsFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
         
-        // Init Views
         val tvVersion = view.findViewById<TextView>(R.id.tvVersion)
         val spinnerTheme = view.findViewById<Spinner>(R.id.spinnerTheme)
         val switchHotspot = view.findViewById<SwitchMaterial>(R.id.switchHotspot)
@@ -35,34 +35,27 @@ class SettingsFragment : Fragment() {
         
         val prefs = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-        // Set Versi App
         tvVersion.text = "XaillaClass Premium v${BuildConfig.VERSION_NAME}"
 
         // --- FITUR TEMA ---
-        val themes = arrayOf("Putih (Default)", "Hitam (Dark Mode)", "Biru")
+        val themes = arrayOf("Putih Elegan", "Biru Transparan", "Hitam Transparan")
         val themeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, themes)
         spinnerTheme.adapter = themeAdapter
         
-        // Load tema tersimpan
         val savedTheme = prefs.getInt(KEY_THEME, 0)
         spinnerTheme.setSelection(savedTheme)
 
-        spinnerTheme.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, v: View?, position: Int, id: Long) {
-                prefs.edit().putInt(KEY_THEME, position).apply()
-                when (position) {
-                    0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) // Putih
-                    1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) // Hitam
-                    2 -> {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                        Toast.makeText(requireContext(), "Tema Biru diterapkan", Toast.LENGTH_SHORT).show()
-                        // Note: Untuk mengubah warna utama menjadi biru sepenuhnya, 
-                        // kita perlu mengubah colorPrimary di themes.xml secara dinamis (via ThemeOverlay).
-                    }
+        spinnerTheme.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                if (prefs.getInt(KEY_THEME, 0) != position) {
+                    prefs.edit().putInt(KEY_THEME, position).apply()
+                    applyTheme(position)
+                    // Restart Activity untuk menerapkan tema secara menyeluruh
+                    requireActivity().recreate()
                 }
             }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
-        })
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
 
         // --- FITUR HOTSPOT ---
         switchHotspot.isChecked = prefs.getBoolean(KEY_HOTSPOT, false)
@@ -81,5 +74,22 @@ class SettingsFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun applyTheme(position: Int) {
+        when (position) {
+            0 -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                requireActivity().setTheme(R.style.Theme_XaillaClass_White)
+            }
+            1 -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                requireActivity().setTheme(R.style.Theme_XaillaClass_Blue)
+            }
+            2 -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                requireActivity().setTheme(R.style.Theme_XaillaClass_Black)
+            }
+        }
     }
 }

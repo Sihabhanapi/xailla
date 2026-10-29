@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="?android:attr/windowBackground"
     android:padding="16dp">
 
     <LinearLayout
@@ -10,14 +11,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- KARTU TEMA -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="#FFFFFF"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="?attr/colorSurface"
             android:layout_marginBottom="16dp">
             
             <LinearLayout
@@ -32,7 +31,7 @@
                     android:text="Tema Aplikasi"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#1A1A2E"/>
+                    android:textColor="?android:attr/textColorPrimary"/>
 
                 <Spinner
                     android:id="@+id/spinnerTheme"
@@ -42,14 +41,12 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- KARTU HOTSPOT & PROXY -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="#FFFFFF"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="?attr/colorSurface"
             android:layout_marginBottom="16dp">
 
             <LinearLayout
@@ -58,7 +55,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Hotspot -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,7 +67,7 @@
                         android:layout_weight="1"
                         android:text="Aktifkan Hotspot"
                         android:textSize="16sp"
-                        android:textColor="#1A1A2E"/>
+                        android:textColor="?android:attr/textColorPrimary"/>
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchHotspot"
                         android:layout_width="wrap_content"
@@ -84,7 +80,6 @@
                     android:background="#E5E7EB"
                     android:layout_marginVertical="8dp"/>
 
-                <!-- Root / No Root -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -97,7 +92,7 @@
                         android:layout_weight="1"
                         android:text="Mode Root (Proxy)"
                         android:textSize="16sp"
-                        android:textColor="#1A1A2E"/>
+                        android:textColor="?android:attr/textColorPrimary"/>
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/switchRoot"
                         android:layout_width="wrap_content"
@@ -106,14 +101,12 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- KARTU DEVELOPER -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="#FFFFFF"
-            xmlns:app="http://schemas.android.com/apk/res-auto">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="?attr/colorSurface">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -127,7 +120,7 @@
                     android:layout_height="wrap_content"
                     android:text="Developer"
                     android:textSize="14sp"
-                    android:textColor="#6B7280"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
                 
                 <TextView
                     android:id="@+id/tvDeveloper"
@@ -136,7 +129,7 @@
                     android:text="XaillaXsh"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#2563EB"
+                    android:textColor="?attr/colorPrimary"
                     android:layout_marginTop="4dp"/>
                 
                 <TextView
@@ -144,7 +137,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
-                    android:textColor="#9CA3AF"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:layout_marginTop="8dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
