@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,18 +46,16 @@ class ConfigFragment : Fragment() {
         val recycler = view.findViewById<RecyclerView>(R.id.recycler)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbarConfig)
 
-        // Menu Toolbar
         toolbar.inflateMenu(R.menu.menu_config)
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.action_save -> { saveConfigToXaillaFile(); true }
+                R.id.action_save -> { saveConfigToDownload(); true }
                 R.id.action_upload -> { openFilePicker(); true }
                 else -> false
             }
         }
 
         adapter = ConfigAdapter(PrefsHelper.loadConfigs(requireContext())) { config ->
-            // Klik item = pilih config DAN tampilkan opsi edit/hapus
             PrefsHelper.setSelected(requireContext(), config.id)
             showEditDeleteDialog(config)
         }
@@ -81,7 +80,6 @@ class ConfigFragment : Fragment() {
         return view
     }
 
-    // ============ DIALOG EDIT / HAPUS ============
     private fun showEditDeleteDialog(config: ServerConfig) {
         val options = arrayOf("Edit Config", "Hapus Config", "Batalkan")
         AlertDialog.Builder(requireContext())
@@ -98,11 +96,9 @@ class ConfigFragment : Fragment() {
     private fun showEditDialog(config: ServerConfig) {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_edit_config, null)
-        
         val etName = dialogView.findViewById<TextInputEditText>(R.id.etEditName)
         val etAddress = dialogView.findViewById<TextInputEditText>(R.id.etEditAddress)
         val etPort = dialogView.findViewById<TextInputEditText>(R.id.etEditPort)
-        
         etName.setText(config.name)
         etAddress.setText(config.address)
         etPort.setText(config.port.toString())
@@ -114,20 +110,14 @@ class ConfigFragment : Fragment() {
                 val newName = etName.text.toString().trim()
                 val newAddress = etAddress.text.toString().trim()
                 val newPort = etPort.text.toString().toIntOrNull() ?: config.port
-
                 if (newName.isEmpty() || newAddress.isEmpty()) {
                     Toast.makeText(requireContext(), "Nama & address tidak boleh kosong", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
-
                 val list = PrefsHelper.loadConfigs(requireContext())
                 val idx = list.indexOfFirst { it.id == config.id }
                 if (idx != -1) {
-                    list[idx] = config.copy(
-                        name = newName,
-                        address = newAddress,
-                        port = newPort
-                    )
+                    list[idx] = config.copy(name = newName, address = newAddress, port = newPort)
                     PrefsHelper.saveConfigs(requireContext(), list)
                     adapter.updateData(list)
                     Toast.makeText(requireContext(), "Config diupdate", Toast.LENGTH_SHORT).show()
@@ -152,15 +142,14 @@ class ConfigFragment : Fragment() {
             .show()
     }
 
-    // ============ SAVE .xailla ============
-    private fun saveConfigToXaillaFile() {
+    // SAVE LANGSUNG KE FOLDER DOWNLOAD
+    private fun saveConfigToDownload() {
         try {
             val list = PrefsHelper.loadConfigs(requireContext())
             if (list.isEmpty()) {
                 Toast.makeText(requireContext(), "Tidak ada config", Toast.LENGTH_SHORT).show()
                 return
             }
-            
             val plainText = list.joinToString("\n") {
                 if (it.protocol == "vmess" || it.protocol == "vless") {
                     "${it.protocol}://${it.uuid}@${it.address}:${it.port}"
@@ -168,18 +157,18 @@ class ConfigFragment : Fragment() {
                     "${it.protocol}://${it.password}@${it.address}:${it.port}"
                 }
             }
-            
-            val encryptedText = EncryptionHelper.encrypt(plainText)
-            val file = File(requireContext().filesDir, "backup_config.xailla")
-            FileOutputStream(file).use { it.write(encryptedText.toByteArray()) }
-            
-            Toast.makeText(requireContext(), "Tersimpan: ${file.name}", Toast.LENGTH_LONG).show()
+            val encrypted = EncryptionHelper.encrypt(plainText)
+
+            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (!downloadDir.exists()) downloadDir.mkdirs()
+            val file = File(downloadDir, "backup_config.xailla")
+            FileOutputStream(file).use { it.write(encrypted.toByteArray()) }
+            Toast.makeText(requireContext(), "Tersimpan: Download/backup_config.xailla", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Gagal save: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // ============ UPLOAD .xailla ============
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "*/*"
@@ -192,28 +181,21 @@ class ConfigFragment : Fragment() {
         try {
             val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
             val fileContent = inputStream?.bufferedReader()?.use { it.readText() }
-            
             if (fileContent.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "File kosong", Toast.LENGTH_SHORT).show()
                 return
             }
-
             val decryptedText = EncryptionHelper.decrypt(fileContent)
             if (decryptedText.isEmpty()) {
                 Toast.makeText(requireContext(), "File .xailla tidak valid", Toast.LENGTH_SHORT).show()
                 return
             }
-
             var count = 0
             val list = PrefsHelper.loadConfigs(requireContext())
             decryptedText.lines().forEach { line ->
                 val config = ConfigParser.parseLink(line.trim())
-                if (config != null) {
-                    list.add(config)
-                    count++
-                }
+                if (config != null) { list.add(config); count++ }
             }
-            
             if (count > 0) {
                 PrefsHelper.saveConfigs(requireContext(), list)
                 adapter.updateData(list)

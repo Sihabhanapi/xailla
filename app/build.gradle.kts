@@ -13,6 +13,7 @@ android {
         targetSdk = 34
         versionCode = 1000
         versionName = "1.0.0"
+        resourceConfigurations += listOf("in", "en")
     }
 
     splits {
@@ -28,9 +29,19 @@ android {
         jniLibs {
             useLegacyPackaging = true
             pickFirsts += listOf(
-                "**"**/libgojni.so",
+                "**/libgojni.so",
                 "**/libtun2socks.so",
                 "**/libc++_shared.so"
+            )
+        }
+        resources {
+            excludes += listOf(
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/*.kotlin_module",
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE*",
+                "META-INF/NOTICE*"
             )
         }
     }
@@ -38,7 +49,11 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            isShrinkResources = false
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -48,9 +63,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-    buildFeatures { 
+    buildFeatures {
         viewBinding = true
-        buildConfig = true 
+        buildConfig = true
     }
 
     applicationVariants.all {
@@ -71,7 +86,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.code.gson:gson:2.10.1")
-    
-    // ENGINE XRAY
+
+    // Engine Xray
     implementation(files("libs/libv2ray.aar"))
 }

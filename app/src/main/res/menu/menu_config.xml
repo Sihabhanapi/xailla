@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_save"
-        android:title="Save Config (.xailla)"
+        android:title="Save Config (.xailla ke Download)"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_upload"
