@@ -2,6 +2,9 @@ package com.xaillaclass.premium.ui
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -55,10 +58,16 @@ class ConfigFragment : Fragment() {
             }
         }
 
-        adapter = ConfigAdapter(PrefsHelper.loadConfigs(requireContext())) { config ->
-            PrefsHelper.setSelected(requireContext(), config.id)
-            showEditDeleteDialog(config)
-        }
+        adapter = ConfigAdapter(
+            items = PrefsHelper.loadConfigs(requireContext()),
+            onSelect = { config ->
+                PrefsHelper.setSelected(requireContext(), config.id)
+                Toast.makeText(requireContext(), "Dipilih: ${config.name}", Toast.LENGTH_SHORT).show()
+            },
+            onEdit = { config -> showEditDialog(config) },
+            onCopy = { config -> copyConfigUrl(config) },
+            onDelete = { config -> showDeleteDialog(config) }
+        )
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
 
@@ -80,22 +89,8 @@ class ConfigFragment : Fragment() {
         return view
     }
 
-    private fun showEditDeleteDialog(config: ServerConfig) {
-        val options = arrayOf("Edit Config", "Hapus Config", "Batalkan")
-        AlertDialog.Builder(requireContext())
-            .setTitle(config.name)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showEditDialog(config)
-                    1 -> showDeleteDialog(config)
-                }
-            }
-            .show()
-    }
-
     private fun showEditDialog(config: ServerConfig) {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_edit_config, null)
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_config, null)
         val etName = dialogView.findViewById<TextInputEditText>(R.id.etEditName)
         val etAddress = dialogView.findViewById<TextInputEditText>(R.id.etEditAddress)
         val etPort = dialogView.findViewById<TextInputEditText>(R.id.etEditPort)
@@ -127,6 +122,17 @@ class ConfigFragment : Fragment() {
             .show()
     }
 
+    private fun copyConfigUrl(config: ServerConfig) {
+        val url = if (config.protocol == "vmess" || config.protocol == "vless") {
+            "${config.protocol}://${config.uuid}@${config.address}:${config.port}"
+        } else {
+            "${config.protocol}://${config.password}@${config.address}:${config.port}"
+        }
+        val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        cm.setPrimaryClip(ClipData.newPlainText("config", url))
+        Toast.makeText(requireContext(), "URL disalin ke clipboard", Toast.LENGTH_SHORT).show()
+    }
+
     private fun showDeleteDialog(config: ServerConfig) {
         AlertDialog.Builder(requireContext())
             .setTitle("Hapus Config")
@@ -142,7 +148,6 @@ class ConfigFragment : Fragment() {
             .show()
     }
 
-    // SAVE LANGSUNG KE FOLDER DOWNLOAD
     private fun saveConfigToDownload() {
         try {
             val list = PrefsHelper.loadConfigs(requireContext())
@@ -158,7 +163,6 @@ class ConfigFragment : Fragment() {
                 }
             }
             val encrypted = EncryptionHelper.encrypt(plainText)
-
             val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             if (!downloadDir.exists()) downloadDir.mkdirs()
             val file = File(downloadDir, "backup_config.xailla")
