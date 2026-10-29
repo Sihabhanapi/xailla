@@ -47,8 +47,8 @@ class ConfigFragment : Fragment() {
         val etLink = view.findViewById<EditText>(R.id.etLink)
         val btnAdd = view.findViewById<Button>(R.id.btnAdd)
         val recycler = view.findViewById<RecyclerView>(R.id.recycler)
-
-        // Toolbar menu tetap ada untuk Upload saja
+        
+        // Toolbar: Upload .xailla (ikon upload di pojok kanan)
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbarConfig)
         toolbar.inflateMenu(R.menu.menu_config)
         toolbar.setOnMenuItemClickListener { item ->
