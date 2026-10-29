@@ -3,73 +3,103 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="Nama Config" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditName" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <!-- BASIC SECTION -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Basic" android:textStyle="bold" android:textColor="?attr/colorPrimary" android:layout_marginBottom="8dp"/>
+        
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="remarks" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditName" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="Server / Address" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditAddress" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="address" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditAddress" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="Port" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditPort" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number"/>
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="port" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditPort" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="UUID / ID" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditUuid" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="id" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditUuid" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="Password (Trojan/SS)" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditPassword" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="alterId" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditAlterId" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="SNI / Host" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditSni" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="security">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddSecurity" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="Path (contoh: /v2ray)" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditPath" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <!-- TRANSPORT SECTION -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Transport" android:textStyle="bold" android:textColor="?attr/colorPrimary" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Network">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddNetwork" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:hint="Network (tcp/ws/grpc)" app:boxBackgroundColor="?attr/colorSurface">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEditNetwork" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="head type">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddHeadType" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchEditTls"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" android:text="Gunakan TLS"
-            android:textColor="?android:attr/textColorPrimary" />
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="ws host" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditWsHost" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="ws path" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditWsPath" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="finalMask raw JSON" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditFinalMask" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- TLS SECTION -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TLS" android:textStyle="bold" android:textColor="?attr/colorPrimary" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="TLS">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddTls" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="SNI" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditSni" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="Fingerprint">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddFingerprint" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="Alpn">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddAlpn" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="allowInsecure">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/ddAllowInsecure" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="EchConfigList" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditEch" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="Verify Peer Cert By Name" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditVerify" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="Certificate fingerprint (SHA-256)" app:boxBackgroundColor="?attr/colorSurface">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etEditCertFingerprint" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- ADVANCED SECTION -->
+        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchFragment" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Fragment" android:textColor="?android:attr/textColorPrimary" />
+        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchSniSpoof" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="SNI Spoofing (Experimental)" android:textColor="?android:attr/textColorPrimary" />
+
+        <!-- SAVE BUTTON -->
+        <Button android:id="@+id/btnSaveConfig" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginTop="24dp" android:layout_marginBottom="24dp" android:text="Save" android:textSize="16sp" android:textStyle="bold" android:textColor="#FFFFFF" android:backgroundTint="?attr/colorPrimary" app:cornerRadius="12dp"/>
     </LinearLayout>
 </ScrollView>
