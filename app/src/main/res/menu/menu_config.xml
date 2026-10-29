@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_save"
-        android:title="Save Config (.xailla ke Download)"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_upload"
-        android:title="Upload Config (.xailla)"
-        app:showAsAction="never" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Menu toolbar dikosongkan, Save pindah ke popup item -->
 </menu>

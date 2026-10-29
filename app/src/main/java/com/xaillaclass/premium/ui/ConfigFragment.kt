@@ -47,12 +47,12 @@ class ConfigFragment : Fragment() {
         val etLink = view.findViewById<EditText>(R.id.etLink)
         val btnAdd = view.findViewById<Button>(R.id.btnAdd)
         val recycler = view.findViewById<RecyclerView>(R.id.recycler)
-        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbarConfig)
 
+        // Toolbar menu tetap ada untuk Upload saja
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbarConfig)
         toolbar.inflateMenu(R.menu.menu_config)
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.action_save -> { saveConfigToDownload(); true }
                 R.id.action_upload -> { openFilePicker(); true }
                 else -> false
             }
@@ -66,6 +66,7 @@ class ConfigFragment : Fragment() {
             },
             onEdit = { config -> showEditDialog(config) },
             onCopy = { config -> copyConfigUrl(config) },
+            onSave = { config -> saveSingleConfigToDownload(config) },
             onDelete = { config -> showDeleteDialog(config) }
         )
         recycler.layoutManager = LinearLayoutManager(requireContext())
@@ -89,6 +90,7 @@ class ConfigFragment : Fragment() {
         return view
     }
 
+    // ============ EDIT DIALOG ============
     private fun showEditDialog(config: ServerConfig) {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_config, null)
         val etName = dialogView.findViewById<TextInputEditText>(R.id.etEditName)
@@ -122,6 +124,7 @@ class ConfigFragment : Fragment() {
             .show()
     }
 
+    // ============ COPY URL ============
     private fun copyConfigUrl(config: ServerConfig) {
         val url = if (config.protocol == "vmess" || config.protocol == "vless") {
             "${config.protocol}://${config.uuid}@${config.address}:${config.port}"
@@ -133,6 +136,28 @@ class ConfigFragment : Fragment() {
         Toast.makeText(requireContext(), "URL disalin ke clipboard", Toast.LENGTH_SHORT).show()
     }
 
+    // ============ SAVE 1 CONFIG KE DOWNLOAD ============
+    private fun saveSingleConfigToDownload(config: ServerConfig) {
+        try {
+            val plainText = if (config.protocol == "vmess" || config.protocol == "vless") {
+                "${config.protocol}://${config.uuid}@${config.address}:${config.port}"
+            } else {
+                "${config.protocol}://${config.password}@${config.address}:${config.port}"
+            }
+            val encrypted = EncryptionHelper.encrypt(plainText)
+
+            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (!downloadDir.exists()) downloadDir.mkdirs()
+            val safeName = config.name.replace(Regex("[^a-zA-Z0-9_-]"), "_")
+            val file = File(downloadDir, "config_${safeName}.xailla")
+            FileOutputStream(file).use { it.write(encrypted.toByteArray()) }
+            Toast.makeText(requireContext(), "Tersimpan: Download/${file.name}", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Gagal save: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // ============ HAPUS ============
     private fun showDeleteDialog(config: ServerConfig) {
         AlertDialog.Builder(requireContext())
             .setTitle("Hapus Config")
@@ -148,31 +173,7 @@ class ConfigFragment : Fragment() {
             .show()
     }
 
-    private fun saveConfigToDownload() {
-        try {
-            val list = PrefsHelper.loadConfigs(requireContext())
-            if (list.isEmpty()) {
-                Toast.makeText(requireContext(), "Tidak ada config", Toast.LENGTH_SHORT).show()
-                return
-            }
-            val plainText = list.joinToString("\n") {
-                if (it.protocol == "vmess" || it.protocol == "vless") {
-                    "${it.protocol}://${it.uuid}@${it.address}:${it.port}"
-                } else {
-                    "${it.protocol}://${it.password}@${it.address}:${it.port}"
-                }
-            }
-            val encrypted = EncryptionHelper.encrypt(plainText)
-            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            if (!downloadDir.exists()) downloadDir.mkdirs()
-            val file = File(downloadDir, "backup_config.xailla")
-            FileOutputStream(file).use { it.write(encrypted.toByteArray()) }
-            Toast.makeText(requireContext(), "Tersimpan: Download/backup_config.xailla", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Gagal save: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
+    // ============ UPLOAD .xailla ============
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "*/*"

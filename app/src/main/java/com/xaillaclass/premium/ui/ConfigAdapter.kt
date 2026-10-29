@@ -15,6 +15,7 @@ class ConfigAdapter(
     private val onSelect: (ServerConfig) -> Unit,
     private val onEdit: (ServerConfig) -> Unit,
     private val onCopy: (ServerConfig) -> Unit,
+    private val onSave: (ServerConfig) -> Unit,
     private val onDelete: (ServerConfig) -> Unit
 ) : RecyclerView.Adapter<ConfigAdapter.VH>() {
 
@@ -33,10 +34,8 @@ class ConfigAdapter(
         holder.tvName.text = item.name
         holder.tvInfo.text = "${item.protocol.uppercase()} • ${item.address}:${item.port}"
         
-        // Klik utama = pilih config
         holder.itemView.setOnClickListener { onSelect(item) }
 
-        // Klik titik 3 = menu popup
         holder.btnOptions.setOnClickListener { btn ->
             val popup = PopupMenu(btn.context, btn)
             popup.menuInflater.inflate(R.menu.menu_item_options, popup.menu)
@@ -44,6 +43,7 @@ class ConfigAdapter(
                 when (menuItem.itemId) {
                     R.id.action_edit -> onEdit(item)
                     R.id.action_copy -> onCopy(item)
+                    R.id.action_save -> onSave(item)
                     R.id.action_delete -> onDelete(item)
                 }
                 true
