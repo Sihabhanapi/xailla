@@ -8,7 +8,6 @@ import android.widget.Toast
 import java.net.NetworkInterface
 
 object HotspotHelper {
-
     private const val XRAY_PORT = 10808
 
     fun getHotspotIpAddress(): String {
@@ -18,13 +17,11 @@ object HotspotHelper {
                 val name = ni.name ?: continue
                 if (name.startsWith("ap") || name.startsWith("swlan") || name.contains("wlan")) {
                     for (addr in ni.inetAddresses) {
-                        if (!addr.isLoopbackAddress && addr.hostAddress?.contains(":") == false) {
-                            return addr.hostAddress ?: "192.168.43.1"
-                        }
+                        if (!addr.isLoopbackAddress && addr.hostAddress?.contains(":") == false) return addr.hostAddress ?: "192.168.43.1"
                     }
                 }
             }
-        } catch (e: Exception) { e.printStackTrace() }
+        } catch (e: Exception) {}
         return "192.168.43.1"
     }
 
@@ -39,75 +36,36 @@ object HotspotHelper {
 
     fun setHotspotEnabled(context: Context, enabled: Boolean, useRoot: Boolean): Boolean {
         return if (useRoot) {
-            enableHotspotRoot(context, enabled)
-        } else {
-            enableHotspotNoRoot(context, enabled)
-        }
-    }
-
-    private fun enableHotspotRoot(context: Context, enabled: Boolean): Boolean {
-        if (!RootHelper.isRooted()) {
-            Toast.makeText(context, "Root tidak tersedia", Toast.LENGTH_LONG).show()
-            return false
-        }
-
-        return try {
+            if (!RootHelper.isRooted()) { Toast.makeText(context, "Root tidak tersedia!", Toast.LENGTH_SHORT).show(); return false }
             val result = if (enabled) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    RootHelper.execRootCommand("cmd connectivity tether start") ||
-                    RootHelper.execRootCommand("svc wifi enable; settings put global tether_enabled 1")
-                } else {
-                    RootHelper.execRootCommand("svc wifi enable") &&
-                    RootHelper.execRootCommand("settings put global tether_enabled 1")
-                }
+                RootHelper.execCmd("svc wifi enable") && RootHelper.execCmd("settings put global tether_enabled 1") && RootHelper.execCmd("service call connectivity 30 i32 1")
             } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    RootHelper.execRootCommand("cmd connectivity tether stop")
-                } else {
-                    RootHelper.execRootCommand("settings put global tether_enabled 0")
-                }
+                RootHelper.execCmd("settings put global tether_enabled 0")
             }
-
-            if (result) {
-                if (enabled) applyProxyIptables() else removeProxyIptables()
-                true
-            } else {
-                Toast.makeText(context, "Gagal tether via root", Toast.LENGTH_SHORT).show()
-                false
+            if (result && enabled) applyIptables()
+            else if (!enabled) removeIptables()
+            result
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !Settings.System.canWrite(context)) {
+                try {
+                    val intent = android.content.Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                    intent.data = android.net.Uri.parse("package:" + context.packageName)
+                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                } catch (e: Exception) {}
+                Toast.makeText(context, "Izinkan ubah pengaturan sistem", Toast.LENGTH_SHORT).show()
+                return false
             }
-        } catch (e: Exception) {
-            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            false
-        }
-    }
-
-    private fun enableHotspotNoRoot(context: Context, enabled: Boolean): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(context)) {
             try {
-                val intent = android.content.Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.data = android.net.Uri.parse("package:" + context.packageName)
-                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-                Toast.makeText(context, "Izinkan pengaturan sistem, lalu coba lagi", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {}
-            return false
-        }
-
-        return try {
-            val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val method = wifi.javaClass.getMethod(
-                "setWifiApEnabled", android.net.wifi.WifiConfiguration::class.java, Boolean::class.javaPrimitiveType
-            )
-            wifi.isWifiEnabled = false
-            method.invoke(wifi, null, enabled) as Boolean
-        } catch (e: Exception) {
-            Toast.makeText(context, "HP tidak support auto-hotspot. Nyalakan manual.", Toast.LENGTH_LONG).show()
-            false
+                val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                if (wifi.isWifiEnabled) { wifi.isWifiEnabled = false; Thread.sleep(500) }
+                val method = wifi.javaClass.getMethod("setWifiApEnabled", android.net.wifi.WifiConfiguration::class.java, Boolean::class.javaPrimitiveType)
+                method.invoke(wifi, null, enabled) as Boolean
+            } catch (e: Exception) { false }
         }
     }
 
-    private fun applyProxyIptables() {
-        // Script VPN Gateway dengan deteksi interface otomatis
+    private fun applyIptables() {
         val script = """
             echo 1 > /proc/sys/net/ipv4/ip_forward
             IFACE=${'$'}(ip link show | grep -oE 'ap[0-9]+|swlan[0-9]+|wlan[0-9]+' | head -n 1)
@@ -117,17 +75,14 @@ object HotspotHelper {
             iptables -t nat -A PREROUTING -i ${'$'}IFACE -p tcp --dport 80 -j REDIRECT --to-port $XRAY_PORT
             iptables -t nat -A PREROUTING -i ${'$'}IFACE -p tcp --dport 443 -j REDIRECT --to-port $XRAY_PORT
         """.trimIndent()
-        
-        RootHelper.execRootCommand(script)
+        RootHelper.execCmd(script)
     }
 
-    private fun removeProxyIptables() {
-        RootHelper.execRootCommand(
-            """
+    private fun removeIptables() {
+        RootHelper.execCmd("""
             iptables -t nat -D POSTROUTING -o wlan0 -j MASQUERADE 2>/dev/null
             iptables -t nat -D PREROUTING -i wlan0 -p tcp --dport 80 -j REDIRECT --to-port $XRAY_PORT 2>/dev/null
             iptables -t nat -D PREROUTING -i wlan0 -p tcp --dport 443 -j REDIRECT --to-port $XRAY_PORT 2>/dev/null
-            """.trimIndent()
-        )
+        """.trimIndent())
     }
 }
