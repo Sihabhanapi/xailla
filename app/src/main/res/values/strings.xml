@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XaillaClass Premium</string>
+    <string name="connect">CONNECT</string>
+    <string name="disconnect">DISCONNECT</string>
+    <string name="status_connected">Status: Connected</string>
+    <string name="status_disconnected">Status: Disconnected</string>
+    <string name="hint_link">Paste vmess:// / vless:// / trojan:// / ss://</string>
+    <string name="add_config">Tambah Config</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_config">Config</string>
+    <string name="nav_log">Log</string>
+    <string name="nav_settings">Settings</string>
+</resources>
